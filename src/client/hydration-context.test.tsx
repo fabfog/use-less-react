@@ -5,6 +5,7 @@ import {
   dehydrateInstances,
   PubSub,
   type SerializableClassesRegistry,
+  type SerializableRecord,
 } from "../classes";
 import { type FC } from "react";
 import { useReactiveInstance } from "./use-reactive-instance";
@@ -24,14 +25,14 @@ export class Sprite extends PubSub {
     this.notify("position");
   }
 
-  static hydrate(json: object) {
+  static hydrate(obj: object) {
     if (
-      "x" in json &&
-      typeof json.x === "number" &&
-      "y" in json &&
-      typeof json.y === "number"
+      "x" in obj &&
+      typeof obj.x === "number" &&
+      "y" in obj &&
+      typeof obj.y === "number"
     ) {
-      return new Sprite(json.x, json.y);
+      return new Sprite(obj.x, obj.y);
     }
     throw new Error("invalid params");
   }
@@ -55,7 +56,7 @@ const serializableClassesRegistry: SerializableClassesRegistry = {
   Sprite,
 };
 
-interface HydrationProps {
+interface HydrationProps extends SerializableRecord {
   sprite1: Sprite;
 }
 
@@ -65,8 +66,12 @@ const [HydrationProvider, useHydratedInstances] =
 const SpriteApp: FC = () => {
   const sprite = new Sprite(0, 0);
 
+  const value: HydrationProps = {
+    sprite1: sprite,
+  };
+
   return (
-    <HydrationProvider dehydratedData={dehydrateInstances({ sprite1: sprite })}>
+    <HydrationProvider dehydratedData={dehydrateInstances(value)}>
       <SpriteComponent />
     </HydrationProvider>
   );

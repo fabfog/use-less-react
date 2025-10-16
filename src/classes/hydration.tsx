@@ -1,12 +1,11 @@
 import type {
   Serializable,
   SerializableClassesRegistry,
+  SerializableRecord,
   SerializedInstance,
 } from "./types";
 
-export function dehydrateInstances<T extends Record<string, Serializable>>(
-  value: T,
-) {
+export function dehydrateInstances<T extends SerializableRecord>(value: T) {
   const serializedData: Record<string, SerializedInstance> = Object.entries(
     value,
   ).reduce((acc, [id, value]) => {

@@ -188,14 +188,14 @@ export class Sprite extends PubSub {
   }
 
   // this method will create an instance from a plain object
-  static hydrate(json: object) {
+  static hydrate(obj: object) {
     if (
-      "x" in json &&
-      typeof json.x === "number" &&
-      "y" in json &&
-      typeof json.y === "number"
+      "x" in obj &&
+      typeof obj.x === "number" &&
+      "y" in obj &&
+      typeof obj.y === "number"
     ) {
-      return new Sprite(json.x, json.y);
+      return new Sprite(obj.x, obj.y);
     }
     throw new Error("invalid params");
   }
@@ -221,7 +221,8 @@ export const serializableClassesRegistry: SerializableClassesRegistry = {
 You must declare a type which defines the structure of the shared data. Of course, for this simple example, it's just `HydratedProps`, but in reality you will have many of them, like `HomePageHydratedProps`, `AboutPageHydratedProps` and so on and so forth.
 ```ts
 // types.ts
-export interface HydratedProps {
+import { SerializableRecord } from "@dxbox/use-less-react/classes";
+export interface HydratedProps extends SerializableRecord {
   sprite1: Sprite;
 }
 ```
@@ -240,11 +241,12 @@ Use the hydration provider in the page (server side) passing it the dehydrated d
 ```ts
 // page.ts (server side)
 import { HydrationProvider } from "./context";
+import { HydratedProps } from "./types";
 import { dehydrateInstances } from "@dxbox/use-less-react/classes";
 
 function Page() {
   const sprite = new Sprite(5, 5);
-  const value = { sprite1: sprite };
+  const value: HydratedProps = { sprite1: sprite };
 
   return (
     <HydrationProvider dehydratedData={dehydrateInstances(value)}>

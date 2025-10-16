@@ -22,3 +22,5 @@ export type SerializableClassesRegistry = Record<
   string,
   SerializableConstructor<Serializable>
 >;
+
+export type SerializableRecord = Record<string, Serializable>;
