@@ -156,3 +156,9 @@ it("Classes decorated with Immutable must fail if not immutable", () => {
   instance.setTodoColor(0, "red");
   expect(instance.todos[0].meta.color).toBe("red");
 });
+
+@ImmutableClass()
+class FakeClass extends PubSubMixin(ThirdPartyTodoStore) {}
+it("Classes must keep their original name when using decorators and mixins", () => {
+  expect(FakeClass.name).toBe("FakeClass");
+});
