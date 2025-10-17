@@ -26,7 +26,7 @@ export function ImmutableClass(
       return ctor;
     }
 
-    return class extends ctor {
+    const decoratedClass = class extends ctor {
       constructor(...args: any[]) {
         super(...args);
 
@@ -44,5 +44,10 @@ export function ImmutableClass(
         }
       }
     };
+
+    // Keep original class name
+    Object.defineProperty(decoratedClass, "name", { value: ctor.name });
+
+    return decoratedClass;
   };
 }
