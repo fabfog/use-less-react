@@ -15,7 +15,7 @@ class Sprite extends PubSub {
   }
 }
 
-it("useReactiveInstance with  instance getter and class extending PubSub", () => {
+it("useReactiveInstance with instance getter and class extending PubSub", () => {
   const { result } = renderHook(() =>
     useReactiveInstance(() => new Sprite(), ["x", "y"]),
   );

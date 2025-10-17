@@ -1,6 +1,6 @@
 import type { Subscriber } from "./types";
 
-export class PubSub {
+class PubSub {
   _subscribers = new Set<Subscriber<typeof this>>();
 
   notify(...propNames: (keyof typeof this)[]): void {
@@ -15,3 +15,5 @@ export class PubSub {
     return () => this._subscribers.delete(callback);
   }
 }
+
+export { PubSub };
