@@ -1,6 +1,7 @@
 import { vi } from "vitest";
 
 import { PubSub, Notifies } from "../classes";
+import { ImmutableClass } from "./decorators/immutable";
 
 export class Sprite extends PubSub {
   x = 0;
@@ -95,4 +96,95 @@ it("Must call notify on value returned by getter", () => {
   expect(subscriber).toHaveBeenCalledWith(["position"]);
 
   expect(instance.position).toStrictEqual({ x: 1, y: 1 });
+});
+
+interface Todo {
+  isCompleted: boolean;
+  label: string;
+  meta?: Partial<{ color: string }>;
+}
+
+@ImmutableClass()
+class TodoStore extends PubSub {
+  constructor(public todos: Todo[] = []) {
+    super();
+  }
+
+  @Notifies("todos")
+  public addTodo(todo: Todo) {
+    this.todos = this.todos.concat(todo);
+  }
+
+  @Notifies("todos")
+  public wrongAddTodo(todo: Todo) {
+    this.todos.push(todo);
+  }
+
+  @Notifies("todos")
+  public wrongToggleTodo(i: number) {
+    this.todos[i].isCompleted = !this.todos[i].isCompleted;
+  }
+
+  @Notifies("todos")
+  public toggleTodo(i: number) {
+    this.todos = this.todos.map((todo, index) =>
+      index === i
+        ? {
+            ...todo,
+            isCompleted: !todo.isCompleted,
+          }
+        : todo,
+    );
+  }
+
+  @Notifies("todos")
+  public wrongSetTodoColor(i: number, color: string) {
+    if (!this.todos[i].meta) {
+      this.todos[i].meta = {};
+    }
+    this.todos[i].meta.color = color;
+  }
+
+  @Notifies("todos")
+  public setTodoColor(i: number, color: string) {
+    this.todos = this.todos.map((todo, index) =>
+      index === i
+        ? {
+            ...todo,
+            meta: {
+              ...todo.meta,
+              color,
+            },
+          }
+        : todo,
+    );
+  }
+}
+
+it("Classes decorated with Immutable must fail if not immutable", () => {
+  const instance = new TodoStore();
+
+  expect(() => {
+    instance.wrongAddTodo({ label: "test", isCompleted: false });
+  }).toThrow("Cannot add property 0, object is not extensible");
+
+  expect(() => {
+    instance.addTodo({ label: "test", isCompleted: false });
+  }).not.toThrow("Cannot add property 0, object is not extensible");
+
+  expect(() => {
+    instance.wrongToggleTodo(0);
+  }).toThrow(
+    "Cannot assign to read only property 'isCompleted' of object '#<Object>'",
+  );
+
+  instance.toggleTodo(0);
+  expect(instance.todos[0].isCompleted).toBe(true);
+
+  expect(() => {
+    instance.wrongSetTodoColor(0, "red");
+  }).toThrow("Cannot add property meta, object is not extensible");
+
+  instance.setTodoColor(0, "red");
+  expect(instance.todos[0].meta.color).toBe("red");
 });
