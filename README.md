@@ -396,10 +396,10 @@ store.user.name = "Bob"; // ❌ TypeError: Cannot assign to read only property
 
 - `ImmutableClass` performs a **deep freeze** — it freezes deeply nested structures.
 - It’s meant as a **development safeguard**, not a performance optimization. Use it to catch unintended state mutations early.
-- You can enable/disable its behaviour without removing it from your code, for example
+- You can disable its behaviour without manually removing it from your code, for example
 
   ```ts
-  @ImmutableClass({ enabled: process.env.NODE_ENV === "production" })
+  @ImmutableClass({ disabled: process.env.NODE_ENV === "production" })
   class SomeClass extends PubSub {
     ...
   }

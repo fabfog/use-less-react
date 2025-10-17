@@ -2,7 +2,7 @@
 
 export type Constructor = new (...args: any[]) => {};
 
-export type Subscriber<T> = (propNames: (keyof T)[]) => void;
+export type Subscriber<T> = (notifiedProps: (keyof T)[]) => void;
 
 export interface Serializable {
   dehydrate(): object;

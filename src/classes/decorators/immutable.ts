@@ -15,17 +15,14 @@ function deepFreeze(value: any) {
 }
 
 interface ImmutableClassOptions {
-  enabled?: boolean;
+  disabled?: boolean;
 }
 
 export function ImmutableClass(
-  options: ImmutableClassOptions = { enabled: true },
+  { disabled }: ImmutableClassOptions = { disabled: false },
 ) {
-  const { enabled = true } = options;
-
   return function <T extends Constructor>(ctor: T) {
-    if (!enabled) {
-      // Se disabilitato, ritorniamo la classe originale senza modifiche
+    if (disabled) {
       return ctor;
     }
 
@@ -33,7 +30,7 @@ export function ImmutableClass(
       constructor(...args: any[]) {
         super(...args);
 
-        if (enabled) {
+        if (!disabled) {
           Object.keys(this).forEach((key) => {
             deepFreeze(this[key]);
           });
