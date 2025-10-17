@@ -14,6 +14,29 @@ class PubSub {
     this._subscribers.add(callback);
     return () => this._subscribers.delete(callback);
   }
+
+  onNotify<T extends (keyof typeof this)[]>(
+    propNames: T,
+    callback: (data: Pick<this, T[number]>) => void | Promise<void>,
+  ) {
+    return this.subscribe((notifiedProps) => {
+      const hasRelevantUpdate = notifiedProps.some((p) =>
+        propNames.includes(p),
+      );
+      if (hasRelevantUpdate) {
+        const data = propNames.reduce<Partial<Pick<this, T[number]>>>(
+          (acc, cur) => {
+            return {
+              ...acc,
+              [cur]: this[cur],
+            };
+          },
+          {},
+        );
+        callback(data as Pick<this, T[number]>);
+      }
+    });
+  }
 }
 
 export { PubSub };
