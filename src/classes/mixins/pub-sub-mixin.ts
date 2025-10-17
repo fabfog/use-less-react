@@ -2,7 +2,7 @@
 import type { Constructor, Subscriber } from "../types";
 
 export function PubSubMixin<TBase extends Constructor>(Base: TBase) {
-  const toReturn = class extends Base {
+  const mixinClass = class extends Base {
     _subscribers = new Set<Subscriber<TBase>>();
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -24,7 +24,7 @@ export function PubSubMixin<TBase extends Constructor>(Base: TBase) {
   };
 
   // Keep original class name
-  Object.defineProperty(toReturn, "name", { value: Base.name });
+  Object.defineProperty(mixinClass, "name", { value: Base.name });
 
-  return toReturn;
+  return mixinClass;
 }
